@@ -1862,28 +1862,28 @@ while True:
 				else : 
 					result_lefttime = ''
 					
-					if len(sorted_datelist) > int(basicSetting[9]):
-						for j in range(int(basicSetting[9])):
+					if len(sorted_datelist) > int(basicSetting[11]):
+						for j in range(int(basicSetting[11])):
 							for i in range(len(ouput_bossData)):
 								if sorted_datelist[j] == ouput_bossData[i][1]:
-									leftTime = ouput_bossData[i][1] - (datetime.datetime.now()  + datetime.timedelta(hours = int(basicSetting[0])))
+									leftTime = ouput_bossData[i][1] - datetime.datetime.now()
 
 									total_seconds = int(leftTime.total_seconds())
 									hours, remainder = divmod(total_seconds,60*60)
 									minutes, seconds = divmod(remainder,60)
 
-									result_lefttime += '다음 ' + ouput_bossData[i][0] + '탐까지 %02d:%02d 남았습니다. ' % (hours,minutes,seconds) + '[' +  ouput_bossData[i][2] + ']\n'
+									result_lefttime += '다음 ' + ouput_bossData[i][0] + '탐까지 %02d:%02d 남았습니다. ' % (hours,minutes) + '[' +  ouput_bossData[i][2]+ ']\n'
 					else :
 						for j in range(len(sorted_datelist)):
 							for i in range(len(ouput_bossData)):						
 								if sorted_datelist[j] == ouput_bossData[i][1]:
-									leftTime = ouput_bossData[i][1] - (datetime.datetime.now()  + datetime.timedelta(hours = int(basicSetting[0])))
+									leftTime = ouput_bossData[i][1] - datetime.datetime.now()
 
 									total_seconds = int(leftTime.total_seconds())
 									hours, remainder = divmod(total_seconds,60*60)
 									minutes, seconds = divmod(remainder,60)
 
-									result_lefttime += '다음 ' + ouput_bossData[i][0] + '탐까지 %02d:%02d 남았습니다. ' % (hours,minutes,seconds) + '[' +  ouput_bossData[i][2] + ']\n'
+									result_lefttime += '다음 ' + ouput_bossData[i][0] + '탐까지 %02d:%02d 남았습니다. ' % (hours,minutes) + '[' +  ouput_bossData[i][2] + ']\n'
 					embed = discord.Embed(
 						description= result_lefttime,
 						color=0xff0000
@@ -1917,7 +1917,7 @@ while True:
 				tmp_boss_information.append('')
 
 				for i in range(bossNum):
-					if bossTimeString[i] == '99:99:99' and bossMungFlag[i] != True :
+					if bossTimeString[i] == '99:99' and bossMungFlag[i] != True :
 						if len(tmp_boss_information[tmp_cnt]) > 1000 :
 							tmp_boss_information.append('')
 							tmp_cnt += 1
