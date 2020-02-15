@@ -1262,15 +1262,15 @@ while True:
 							chkpos = hello.find(':')
 							hours1 = hello[chkpos-2:chkpos]
 							minutes1 = hello[chkpos+1:chkpos+3]
-							now2 = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
-							tmp_now = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
+							now2 = datetime.datetime.now()
+							tmp_now = datetime.datetime.now()
 							tmp_now = tmp_now.replace(hour=int(hours1), minute=int(minutes1))
 						else:
 							chkpos = len(hello)-2
 							hours1 = hello[chkpos-2:chkpos]
 							minutes1 = hello[chkpos:chkpos+2]
-							now2 = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
-							tmp_now = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
+							now2 = datetime.datetime.now()
+							tmp_now = datetime.datetime.now()
 							tmp_now = tmp_now.replace(hour=int(hours1), minute=int(minutes1))
 					else:
 						now2 = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
