@@ -1862,8 +1862,8 @@ while True:
 				else : 
 					result_lefttime = ''
 					
-					if len(sorted_datelist) > int(basicSetting[11]):
-						for j in range(int(basicSetting[11])):
+					if len(sorted_datelist) > int(basicSetting[9]):
+						for j in range(int(basicSetting[9])):
 							for i in range(len(ouput_bossData)):
 								if sorted_datelist[j] == ouput_bossData[i][1]:
 									leftTime = ouput_bossData[i][1] - datetime.datetime.now()
