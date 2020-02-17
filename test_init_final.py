@@ -1453,15 +1453,12 @@ while True:
 
 			################ ?????????????? ################ 
 
-			if message.content == '!오빠' :
-				await PlaySound(voice_client1, './sound/오빠.mp3')
-			if message.content == '!언니' :
-				await PlaySound(voice_client1, './sound/언니.mp3')
-			if message.content == '!형' :
-				await PlaySound(voice_client1, './sound/형.mp3')
-			if message.content == '!TJ' or message.content == '!tj' :
-				resultTJ = random.randrange(1,9)
-				await PlaySound(voice_client1, './sound/TJ' + str(resultTJ) +'.mp3')
+			if message.content == '!신하츠' :
+				await PlaySound(voice_client1, './sound/신하츠.mp3')
+			if message.content == '!쵸끼' :
+				await PlaySound(voice_client1, './sound/쵸끼.mp3')
+			if message.content == '!개쵸파' :
+				await PlaySound(voice_client1, './sound/개쵸파.mp3')
 
 
 			################ 분배 결과 출력 ################ 
