@@ -1458,8 +1458,10 @@ while True:
 			if message.content == '!쵸끼' :
 				await PlaySound(voice_client1, './sound/쵸끼.mp3')
 			if message.content == '!개쵸파' :
-				await PlaySound(voice_client1, './sound/개쵸파.mp3')
-
+				await PlaySound(voice_client1, './sound/파일1.mp3')
+			if message.content == '!아퐁' :
+				await PlaySound(voice_client1, './sound/파일2.mp3')
+				
 
 			################ 분배 결과 출력 ################ 
 
