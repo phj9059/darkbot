@@ -313,19 +313,19 @@ def init():
 		fb.append(tmp_fixed_bossData[j][1][tmp_fixed_len+1:])     #fixed_bossData[2] : 분
 		fb.append(tmp_fixed_bossData[j][4][20:])                  #fixed_bossData[3] : 분전 알림멘트
 		fb.append(tmp_fixed_bossData[j][5][13:])                  #fixed_bossData[4] : 젠 알림멘트
-		fb.append(tmp_fixed_bossData[j][2][12:tmp_fixedGen_len])  #fixed_bossData[5] : 젠주기-시
-		fb.append(tmp_fixed_bossData[j][2][tmp_fixedGen_len+1:])  #fixed_bossData[6] : 젠주기-분
-		fb.append(tmp_fixed_bossData[j][3][12:16])                #fixed_bossData[7] : 시작일-년	
-		fb.append(tmp_fixed_bossData[j][3][17:19])                #fixed_bossData[8] : 시작일-월
-		fb.append(tmp_fixed_bossData[j][3][20:22])                #fixed_bossData[9] : 시작일-일
+		fb.append('')                              #fixed_bossData[6] : 메세지
 		fixed_bossData.append(fb)
 		fb = []
+		fixed_bossTime.append(datetime.datetime.now()+datetime.timedelta(days=365, hours = int(basicSetting[0])))
+		tmp_fixed_bossTime.append(datetime.datetime.now()+datetime.timedelta(days=365, hours = int(basicSetting[0])))
+		fixed_bossTimeString.append('99:99:99')
+		fixed_bossDateString.append('9999-99-99')
+		tmp_fixed_bossTimeString.append('99:99:99')
+		tmp_fixed_bossDateString.append('9999-99-99')
 		fixed_bossFlag.append(False)
 		fixed_bossFlag0.append(False)
-		fixed_bossTime.append(tmp_fixed_now.replace(year = int(fixed_bossData[j][7]), month = int(fixed_bossData[j][8]), day = int(fixed_bossData[j][9]), hour=int(fixed_bossData[j][1]), minute=int(fixed_bossData[j][2]), second = int(0)))
-		if fixed_bossTime[j] < tmp_fixed_now :
-			while fixed_bossTime[j] < tmp_fixed_now :
-				fixed_bossTime[j] = fixed_bossTime[j] + datetime.timedelta(hours=int(fixed_bossData[j][5]), minutes=int(fixed_bossData[j][6]), seconds = int(0))
+		fixed_bossMungFlag.append(False)
+		fixed_bossMungCnt.append(0)
 	
 	################# 리젠보스 시간 정렬 ######################
 	regenData = []
@@ -488,7 +488,10 @@ async def task():
 					if basicSetting[3] != '0':
 						if fixed_bossFlag0[i] == False:
 							fixed_bossFlag0[i] = True
-							await client.get_channel(channel).send("```" + fixed_bossData[i][0] + ' ' + basicSetting[3] + '분 전 ' + fixed_bossData[i][3] +' [' +  fixed_bossTime[i].strftime('%H:%M:%S') + ']```', tts=False)
+							if fixed_bossData[i][6] != '' :
+								await client.get_channel(channel).send("```" + fixed_bossData[i][0] + ' ' + basicSetting[3] + '분 전 ' + fixed_bossData[i][3] + '\n<' + fixed_bossData[i][7] + '>```', tts=False)
+							else :
+								await client.get_channel(channel).send("```" + fixed_bossData[i][0] + ' ' + basicSetting[3] + '분 전 ' + fixed_bossData[i][3] +'```', tts=False)
 							await PlaySound(voice_client1, './sound/' + fixed_bossData[i][0] + '알림1.mp3')
 
 				################ before_alert ################ 
@@ -496,20 +499,28 @@ async def task():
 					if basicSetting[1] != '0' :
 						if fixed_bossFlag[i] == False:
 							fixed_bossFlag[i] = True
-							await client.get_channel(channel).send("```" + fixed_bossData[i][0] + ' ' + basicSetting[1] + '분 전 ' + fixed_bossData[i][3] +' [' +  fixed_bossTime[i].strftime('%H:%M:%S') + ']```', tts=False)
-							await PlaySound(voice_client1, './sound/' + fixed_bossData[i][0] + '알림.mp3')
+							if fixed_bossData[i][6] != '' :
+								await client.get_channel(channel).send("```" + fixed_bossData[i][0] + ' ' + basicSetting[3] + '분 전 ' + fixed_bossData[i][3] + '\n<' + fixed_bossData[i][7] + '>```', tts=False)
+							else :
+								await client.get_channel(channel).send("```" + fixed_bossData[i][0] + ' ' + basicSetting[3] + '분 전 ' + fixed_bossData[i][3] +'```', tts=False)
+							await PlaySound(voice_client1, './sound/' + fixed_bossData[i][0] + '알림1.mp3')
 				
 				################ 보스 젠 시간 확인 ################
 				if fixed_bossTime[i] <= now :
-					fixed_bossTime[i] = fixed_bossTime[i]+datetime.timedelta(hours=int(fixed_bossData[i][5]), minutes=int(fixed_bossData[i][6]), seconds = int(0))
-					fixed_bossFlag0[i] = False
-					fixed_bossFlag[i] = False
-					embed = discord.Embed(
-							description= "```" + fixed_bossData[i][0] + fixed_bossData[i][4] + "```" ,
-							color=0x00ff00
-							)
-					await client.get_channel(channel).send(embed=embed, tts=False)
+					#print ('if ', fixed_bossTime[i])
+					fixed_bossMungFlag[i] = True
+					tmp_fixed_bossTime[i] = bossTime[i]
+					tmp_fixed_bossTimeString[i] = tmp_fixed_bossTime[i].strftime('%H:%M:%S')
+					tmp_fixed_bossDateString[i] = tmp_fixed_bossTime[i].strftime('%Y-%m-%d')
+					fixed_bossTimeString[i] = '99:99:99'
+					fixed_bossDateString[i] = '9999-99-99'
+					fixed_bossTime[i] = now+datetime.timedelta(days=365)
+					if fixed_bossData[i][6] != '' : 
+						await client.get_channel(channel).send("```" + fixed_bossData[i][0] + ' ' + '탐 ' + fixed_bossData[i][3] + '```', tts=False)
+					else :
+						await client.get_channel(channel).send("```" + fixed_bossData[i][0] + ' ' + '탐 ' + fixed_bossData[i][3] + '```', tts=False)
 					await PlaySound(voice_client1, './sound/' + fixed_bossData[i][0] + '젠.mp3')
+
 
 			################ 일반 보스 확인 ################ 
 			for i in range(bossNum):
@@ -742,25 +753,6 @@ async def dbLoad():
 		LoadChk = 1
 		print ("보스타임 정보가 없습니다.")
 
-#고정보스 날짜저장
-async def FixedBossDateSave():
-	global fixed_bossData
-	global fixed_bossTime
-	global fixed_bossNum
-	global FixedBossDateData
-	global indexFixedBossname
-
-	for i in range(fixed_bossNum):
-		FixedBossDateData[indexFixedBossname[i] + 3] = 'startDate = '+ fixed_bossTime[i].strftime('%Y-%m-%d') + '\n'
-
-	FixedBossDateDataSTR = ""
-	for j in range(len(FixedBossDateData)):
-		pos = len(FixedBossDateData[j])
-		tmpSTR = FixedBossDateData[j][:pos-1] + '\r\n'
-		FixedBossDateDataSTR += tmpSTR
-
-	contents = repo.get_contents("fixed_boss.ini")
-	repo.update_file(contents.path, "bossDB", FixedBossDateDataSTR, contents.sha)
 
 #음성채널 입장
 async def JointheVC(VCchannel, TXchannel):
@@ -1296,6 +1288,63 @@ while True:
 					tmp_bossDateString[i] = bossDateString[i] = nextTime.strftime('%Y-%m-%d')
 					embed = discord.Embed(
 							description= '```다음 ' + bossData[i][0] + ' ' + bossTimeString[i] + '입니다.```',
+							color=0xff0000
+							)
+					await client.get_channel(channel).send(embed=embed, tts=False)
+					
+					
+			################ 보스 컷처리 ################ 
+			
+				if message.content.startswith(fixed_bossData[i][0] +'컷'):
+					if hello.find('  ') != -1 :
+						fixed_bossData[i][6] = hello[hello.find('  ')+2:]
+						hello = hello[:hello.find('  ')]
+					else:
+						fixed_bossData[i][6] = ''
+						
+					tmp_msg = fixed_bossData[i][0] +'컷'
+					if len(hello) > len(tmp_msg) + 3 :
+						if hello.find(':') != -1 :
+							chkpos = hello.find(':')
+							hours1 = hello[chkpos-2:chkpos]
+							minutes1 = hello[chkpos+1:chkpos+3]
+							now2 = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
+							tmp_now = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
+							tmp_now = tmp_now.replace(hour=int(hours1), minute=int(minutes1))
+						else:
+							chkpos = len(hello)-2
+							hours1 = hello[chkpos-2:chkpos]
+							minutes1 = hello[chkpos:chkpos+2]
+							now2 = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
+							tmp_now = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
+							tmp_now = tmp_now.replace(hour=int(hours1), minute=int(minutes1))
+					else:
+						now2 = datetime.datetime.now() + datetime.timedelta(hours = int(basicSetting[0]))
+						tmp_now = now2
+
+					fixed_bossFlag[i] = False
+					fixed_bossFlag0[i] = False
+					fixed_bossMungFlag[i] = False
+					fixed_bossMungCnt[i] = 0
+
+					if tmp_now > now2 :
+						tmp_now = tmp_now + datetime.timedelta(days=int(-1))
+						
+					if tmp_now < now2 : 
+						deltaTime = datetime.timedelta(hours = int(fixed_bossData[i][1]), minutes = int(fixed_bossData[i][5]))
+						while now2 > tmp_now :
+							tmp_now = tmp_now + deltaTime
+							fixed_bossMungCnt[i] = fixed_bossMungCnt[i] + 1
+						now2 = tmp_now
+						fixed_bossMungCnt[i] = fixed_bossMungCnt[i] - 1
+					else :
+						now2 = now2 + datetime.timedelta(hours = int(fixed_bossData[i][1]), minutes = int(fixed_bossData[i][5]))
+								
+					tmp_fixed_bossTime[i] = fixed_bossTime[i] = nextTime = now2
+					tmp_fixed_bossTimeString[i] = fixed_bossTimeString[i] = nextTime.strftime('%H:%M:%S')
+					tmp_fixed_bossDateString[i] = fixed_bossDateString[i] = nextTime.strftime('%Y-%m-%d')
+					embed = discord.Embed(
+							description= '```다음 ' + fixed_bossData[i][0] + ' ' + fixed_bossTimeString[i] + '입니다.```',
 							color=0xff0000
 							)
 					await client.get_channel(channel).send(embed=embed, tts=False)
@@ -1989,6 +2038,183 @@ while True:
 					for i in range(len(boss_information)-1):
 						if len(boss_information[i+1]) != 0:
 							boss_information[i+1] = "```diff\n" + boss_information[i+1] + "\n```"
+						else :
+							boss_information[i+1] = '``` ```'
+
+						embed = discord.Embed(
+								title = '',
+								description= boss_information[i+1],
+								color=0x0000ff
+								)
+						await client.get_channel(channel).send( embed=embed, tts=False)
+					###########################미예약보스출력
+					if len(tmp_boss_information[0]) != 0:
+						if len(tmp_boss_information) == 1 :
+							tmp_boss_information[0] = "```fix\n" + tmp_boss_information[0][:len(tmp_boss_information[0])-1] + "\n```"
+						else:
+							tmp_boss_information[0] = "```fix\n" + tmp_boss_information[0] + "\n```"
+					else :
+						tmp_boss_information[0] = '``` ```'
+
+					embed = discord.Embed(
+						title = "----- 미예약 보스 -----",
+						description= tmp_boss_information[0],
+						color=0x0000ff
+						)
+					await client.get_channel(channel).send( embed=embed, tts=False)
+					for i in range(len(tmp_boss_information)-1):
+						if len(tmp_boss_information[i+1]) != 0:
+							if i == len(tmp_boss_information)-2:
+								tmp_boss_information[i+1] = "```fix\n" + tmp_boss_information[i+1][:len(tmp_boss_information[i+1])-1] + "\n```"
+							else:
+								tmp_boss_information[i+1] = "```fix\n" + tmp_boss_information[i+1] + "\n```"							
+						else :
+							tmp_boss_information[i+1] = '``` ```'
+
+						embed = discord.Embed(
+								title = '',
+								description= tmp_boss_information[i+1],
+								color=0x0000ff
+								)
+						await client.get_channel(channel).send( embed=embed, tts=False)
+
+				await dbSave()
+				await kill_list_Save()
+				
+			################ 보스타임 출력 ################ 
+
+			if message.content == message.content == '++':
+				
+				datelist = []
+				datelist2 = []
+				temp_bossTime1 = []
+				temp_fixed_bossTime1 = []
+				ouput_bossData = []
+				aa = []
+				
+				for i in range(bossNum):
+					if bossMungFlag[i] == True :
+						datelist2.append(tmp_bossTime[i])
+					else :
+						datelist2.append(bossTime[i])
+
+				for i in range(fixed_bossNum):
+					if fixed_bossMungFlag[i] == True :
+						datelist2.append(tmp_fixed_bossTime[i])
+
+				datelist = list(set(datelist2))
+
+				tmp_boss_information = []
+				tmp_fixed_boss_information = []
+				tmp_cnt = 0
+				tmp_boss_information.append('')
+				tmp_fixed_boss_information.append('')
+
+				for i in range(bossNum):
+					if bossTimeString[i] == '99:99:99' and bossMungFlag[i] != True :
+						if len(tmp_boss_information[tmp_cnt]) > 1000 :
+							tmp_boss_information.append('')
+							tmp_cnt += 1
+						tmp_boss_information[tmp_cnt] = tmp_boss_information[tmp_cnt] + bossData[i][0] + ','
+					else :
+						aa.append(bossData[i][0])		                     #output_bossData[0] : 보스명
+						if bossMungFlag[i] == True :
+							aa.append(tmp_bossTime[i])                       #output_bossData[1] : 시간
+							aa.append(tmp_bossTime[i].strftime('%H:%M'))  #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(tmp_bossTime[i].strftime('%H:%M'))  
+							aa.append('-')	                                 #output_bossData[3] : -
+						else :
+							aa.append(bossTime[i])                           #output_bossData[1] : 시간
+							aa.append(bossTime[i].strftime('%H:%M'))      #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(bossTime[i].strftime('%H:%M'))  
+							aa.append('+')	                                 #output_bossData[3] : +
+						aa.append(bossData[i][2])                            #output_bossData[4] : 멍/미입력 보스
+						aa.append(bossMungCnt[i])	                         #output_bossData[5] : 멍/미입력횟수
+						aa.append(bossData[i][6])	                         #output_bossData[6] : 메세지
+						ouput_bossData.append(aa)
+						aa = []
+
+				for i in range(fixed_bossNum):
+					if fixed_bossTimeString[i] == '99:99:99' and fixed_bossMungFlag[i] != True :
+						if len(tmp_fixed_boss_information[tmp_cnt]) > 1000 :
+							tmp_fixed_boss_information.append('')
+							tmp_cnt += 1
+						tmp_fixed_boss_information[tmp_cnt] = tmp_fixed_boss_information[tmp_cnt] + fixed_bossData[i][0] + ','
+					else :
+						aa.append(fixed_bossData[i][0])		                     #output_bossData[0] : 보스명
+						if fixed_bossMungFlag[i] == True :
+							aa.append(tmp_fixed_bossTime[i])                       #output_bossData[1] : 시간
+							aa.append(tmp_fixed_bossTime[i].strftime('%H:%M'))  #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(tmp_bossTime[i].strftime('%H:%M'))  
+							aa.append('-')	                                 #output_bossData[3] : -
+						else :
+							aa.append(fixed_bossTime[i])                           #output_bossData[1] : 시간
+							aa.append(fixed_bossTime[i].strftime('%H:%M'))      #output_bossData[2] : 시간(00:00:00) -> 초빼기 : aa.append(bossTime[i].strftime('%H:%M'))  
+							aa.append('+')	                                 #output_bossData[3] : +
+						aa.append(fixed_bossData[i][2])                            #output_bossData[4] : 멍/미입력 보스
+						aa.append(fixed_bossMungCnt[i])	                         #output_bossData[5] : 멍/미입력횟수
+						aa.append(fixed_bossData[i][6])	                         #output_bossData[6] : 메세지
+						ouput_bossData.append(aa)
+						aa = []
+
+				boss_information = []
+				cnt = 0
+				boss_information.append('')
+
+				for timestring in sorted(datelist):
+					if len(boss_information[cnt]) > 1800 :
+						boss_information.append('')
+						cnt += 1
+					for i in range(len(ouput_bossData)):
+						if timestring == ouput_bossData[i][1]:
+							if ouput_bossData[i][4] == '0' :
+								if ouput_bossData[i][5] == 0 :
+									boss_information[cnt] = boss_information[cnt] + ouput_bossData[i][3] + ' ' + ouput_bossData[i][2] + ' : ' + ouput_bossData[i][0] + ' ' + ouput_bossData[i][6] + '\n'
+								else :
+									boss_information[cnt] = boss_information[cnt] + ouput_bossData[i][3] + ' ' + ouput_bossData[i][2] + ' : ' + ouput_bossData[i][0] + ' (미 ' + str(ouput_bossData[i][5]) + '회)' + ' ' + ouput_bossData[i][6] + '\n'
+							else : 
+								if ouput_bossData[i][5] == 0 :
+									boss_information[cnt] = boss_information[cnt] + ouput_bossData[i][3] + ' ' + ouput_bossData[i][2] + ' : ' + ouput_bossData[i][0] + ' ' + ouput_bossData[i][6] + '\n'
+								else :
+									boss_information[cnt] = boss_information[cnt] + ouput_bossData[i][3] + ' ' + ouput_bossData[i][2] + ' : ' + ouput_bossData[i][0] + ' (멍 ' + str(ouput_bossData[i][5]) + '회)' + ' ' + ouput_bossData[i][6] + '\n'
+
+				if len(boss_information) == 1 and len(tmp_boss_information) == 1:
+					###########################
+					if len(boss_information[0]) != 0:
+						boss_information[0] = "```diff\n" + boss_information[0] + "\n```"
+					else :
+						boss_information[0] = '``` ```'
+
+					if len(tmp_boss_information[0]) != 0:
+						tmp_boss_information[0] = "```fix\n" + tmp_boss_information[0][:len(tmp_boss_information[0])-1] + "\n```"
+					else :
+						tmp_boss_information[0] = '``` ```'
+
+					embed = discord.Embed(
+							title = "----- 보스탐 정보 -----",
+							description= boss_information[0],
+							color=0x0000ff
+							)
+					embed.add_field(
+							name="----- 미예약 보스 -----",
+							value= tmp_boss_information[0],
+							inline = False
+							)
+					
+					await client.get_channel(channel).send( embed=embed, tts=False)
+				else : 
+					###########################일반보스출력
+					if len(boss_information[0]) != 0:
+						boss_information[0] = "```diff\n" + boss_information[0] + fixed_boss_information[0] + "\n```"
+					else :
+						boss_information[0] = '``` ```'
+
+					embed = discord.Embed(
+							title = "----- 보스탐 정보 -----",
+							description= boss_information[0],
+							color=0x0000ff
+							)
+					await client.get_channel(channel).send( embed=embed, tts=False)
+					for i in range(len(boss_information)-1):
+						if len(boss_information[i+1]) != 0:
+							boss_information[i+1] = "```diff\n" + boss_information[i+1] + fixed_boss_information[0] + "\n```"
 						else :
 							boss_information[i+1] = '``` ```'
 
